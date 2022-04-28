@@ -1,18 +1,11 @@
 'use strict';
-
 const fs = require('fs');
-const axios = require('axios');
 
 let jsonData = fs.readFileSync("./config.json", "utf8");
 let data = JSON.parse(jsonData)
-let services = require('./modules/Services.js')
+let services = require('./modules/services.js')
 main();
 
-/**
- * main function, where the magic happens
- * @param {string} account 
- * @param {string} course 
- */
  async function main() {
     let email = data['email'];
     let password = data['password'];
@@ -54,26 +47,26 @@ async function getCompleteCourse(slug) {
  async function downloadVideosFromSection(section, courseSlug, folder) {
 	let videos = section.videos
 	videos.forEach(async video => { 
-		let currentVideoTitle = tratarTitulo(video.nome)
+		let currentVideoTitle = removeSpecialCharacters(video.nome)
 		let videoID = video.id
-		let createdFolder = create_folder(folder)
+		let createdFolder = createFolder(folder)
 		let videoPath = `${createdFolder}/${currentVideoTitle}.mp4`
 		let url = await services.fetchVideo(videoID, courseSlug)
 		services.downloadVideo(videoPath, url)
 	});
 }
 
-function tratarTitulo(titulo) {
-	var textoSemAcentos = titulo.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-	var textoTratado = textoSemAcentos.replace(/[^\w\s]/gi, '');
-	return textoTratado;
+function removeSpecialCharacters(string) {
+	var withoutAccent = string.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+	var withoutSpecialCharacters = withoutAccent.replace(/[^\w\s]/gi, '');
+	return withoutSpecialCharacters;
 }
 
- function create_folder(dir) {
+ function createFolder(dir) {
 	 let folders = dir.split('/')
-	 var currentFolder = ""
+	 var currentFolder = "Downloads/"
 	 folders.forEach( folder => {
-		let folderTratado = tratarTitulo(folder)
+		let folderTratado = removeSpecialCharacters(folder)
 		currentFolder += `${folderTratado}/`
 		if (!fs.existsSync(__dirname + '/' + currentFolder)) {
 			fs.mkdirSync(__dirname + '/' + currentFolder);	
