@@ -19,8 +19,8 @@ main();
 	formationNames.forEach( async formationName => {
 		console.log(formationName)
 		let formation = await fetchFormation(formationName)
-		formation.steps.forEach( async step => {
-			await getCoursesFromStep(step, formation.title)
+		formation.steps.forEach( async (step, index) => {
+			await getCoursesFromStep(step, formation.title, index)
 		})
 	})
 }
@@ -42,13 +42,13 @@ async function fetchFormation(formationName) {
 	return formation
 }
 
-async function getCoursesFromStep(step, formation) {
-	step.courses.forEach( async course => {
+async function getCoursesFromStep(step, formation, stepIndex) {
+	step.courses.forEach( async (course, coursesIndex) => {
 		let slug = course.slug
 		services.enterCourse(slug)
 		let completeCourse = await getCompleteCourse(slug)
-		let folder = `${formation}/${step.title}/${course.title}`
-		completeCourse.sections.forEach( section => {
+		completeCourse.sections.forEach( async (section, index) => {
+			let folder = `${formation}/${stepIndex + 1} ${step.title}/${coursesIndex + 1} ${course.title}/ ${index + 1} - ${section.titulo}`
 			downloadVideosFromSection(section, slug, folder)
 		})
 	})
@@ -61,11 +61,12 @@ async function getCompleteCourse(slug) {
 
  async function downloadVideosFromSection(section, courseSlug, folder) {
 	let videos = section.videos
-	videos.forEach(async video => { 
+	console.log(videos.length)
+	videos.forEach(async (video, index) => { 
 		let currentVideoTitle = removeSpecialCharacters(video.nome)
 		let videoID = video.id
 		let createdFolder = createFolder(folder)
-		let videoPath = `${createdFolder}/${currentVideoTitle}.mp4`
+		let videoPath = `${createdFolder}/${index + 1} ${currentVideoTitle}.mp4`
 		let url = await services.fetchVideo(videoID, courseSlug)
 		services.downloadVideo(videoPath, url)
 	});
