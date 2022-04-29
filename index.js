@@ -9,16 +9,31 @@ main();
  async function main() {
     let email = data['email'];
     let password = data['password'];
-	let formationName = data['formation']
+	let formationList = data['formations']
     
 	let logged = await services.login(email, password);
 	if (!logged) { return }
 
-	let formation = await fetchFormation(formationName)
+	let formationNames = getFormationsNames(formationList)
 
-	formation.steps.forEach( async step => {
-		await getCoursesFromStep(step, formation.title)
+	formationNames.forEach( async formationName => {
+		console.log(formationName)
+		let formation = await fetchFormation(formationName)
+		formation.steps.forEach( async step => {
+			await getCoursesFromStep(step, formation.title)
+		})
 	})
+}
+
+function getFormationsNames(formationList) {
+	var names = []
+	formationList.forEach( formation => {
+		let splited = formation.split('/')
+		let name = splited[splited.length - 1]
+		console.log(name)
+		names.push(name)
+	});
+	return names
 }
 
 async function fetchFormation(formationName) {
