@@ -1,8 +1,9 @@
 {
-	"email": ".",
-	"password": ".",
+	"email": "william.s.s@outlook.com",
+	"password": "S3nh@f0rt3",
     "formations": [
         "https://cursos.alura.com.br/formacao-jogos-unity",
         "https://cursos.alura.com.br/formacao-Python-linguagem"
-    ]
+    ],
+    "downloadAllFormations": true
 }
